@@ -103,6 +103,7 @@ PtrTree maximumIterative(PtrTree *node){
 }
 
 int main(){
+
   NodeTree *tree;
   initTree(&tree);
   Object ob;
