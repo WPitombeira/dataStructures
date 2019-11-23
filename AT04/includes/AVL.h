@@ -30,11 +30,10 @@ void singleRightRotation(Pointer *node);
 void singleRightRotation(Pointer *node);
 void doubleLeftRotation(Pointer *node);
 void doubleRightRotation(Pointer *node);
-void print(Pointer *node);
-int maxDepth(Pointer *node);
-int height(Pointer *node);
+int heightTree(Pointer *node);
 Pointer getMaxAux(Pointer *node);
-Pointer getMinAux(Pointer *node);
+void print(FILE*, Pointer *node);
+void printAux(FILE*, Pointer *node, int);
 
 
 // queue headers

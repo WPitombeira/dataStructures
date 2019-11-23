@@ -1,55 +1,6 @@
 #include "includes/AVL.h"
 
-// queue implementations
-
-void initQueue(queue *queue){
-  queue->start = NULL;
-  queue->end = NULL;
-  queue->count = 0;
-}
-
-void enqueue(queue *queue) {
-    PtrQueue aux;
-    ObQueue x;
-
-    aux = (PtrQueue) malloc(sizeof (nodeQueue));
-
-    aux->obj = x;
-
-    if (queue->count == 0) {
-        queue->start = aux;
-        queue->end = aux;
-        aux->next = NULL;
-    } else {
-        aux->next = NULL;
-        queue->end->next = aux;
-        queue->end = queue->end->next;
-    }
-    queue->contador++;
-}
-
-Objeto dequeue(queue *queue) {
-    if(queue->count == 0){
-        printf("## Queue Empty\n");
-    }else{
-
-    ptrNoFila aux;
-
-    aux = queue->start;
-    queue->start = queue->start->next;
-
-    Objeto ret = aux->obj;
-    free(aux);
-
-    queue->count--;
-
-    return(ret);
-
-    }
-}
-
 // AVL Implementations
-
 void initTree(Pointer *node){
   (*node) = NULL;
 }
@@ -89,6 +40,10 @@ bool insert(Pointer *node, Object ob){
     printf("Unbalanced..\n");
     makeRotations(&(*node), bf);
   }
+  rh = heightTree(&(*node)->right);
+  lh = heightTree(&(*node)->left);
+  bf = rh-lh;
+  (*node)->bF = bf;
 }
 
 void makeRotations(Pointer *node, int bf){
@@ -98,21 +53,21 @@ void makeRotations(Pointer *node, int bf){
     // Right Rotations
     if(heightTree(&(aux)->right) > heightTree(&(aux)->left)){
       // RSD
-      printf("RSD\n");
+      // printf("RSD\n");
       singleLeftRotation(&(*node));
     } else {
       // RDD
-      printf("RDD\n");
+      // printf("RDD\n");
       doubleLeftRotation(&(*node));
     }
   } else if(bf == -2){
     aux = (*node)->left;
     // left rotations
     if(heightTree(&aux->left) >= heightTree(&aux->right)){
-      printf("RSE\n");
+      // printf("RSE\n");
       singleRightRotation(&(*node));
     } else {
-      printf("RDE\n");
+      // printf("RDE\n");
       doubleRightRotation(&(*node));
     }
   }
@@ -121,7 +76,6 @@ void makeRotations(Pointer *node, int bf){
 int heightTree(Pointer *node){
   int lh, rh;
   if((*node)==NULL) return 0;
-
   else {
     lh = heightTree(&(*node)->left);
     rh = heightTree(&(*node)->right);
@@ -158,6 +112,12 @@ void doubleLeftRotation(Pointer *node){
   v->right = u;
   v->left = (*node);
   (*node) = v;
+  int lh1 = heightTree(&(*node)->left->left);
+  int rh1 = heightTree(&(*node)->left->right);
+  int lh2 = heightTree(&(*node)->right->left);
+  int rh2 = heightTree(&(*node)->right->right);
+  (*node)->left->bF = lh1-rh1;
+  (*node)->right->bF = lh2-rh2;
 }
 
 void doubleRightRotation(Pointer *node){
@@ -169,6 +129,12 @@ void doubleRightRotation(Pointer *node){
   v->right = (*node);
   v->left = u;
   (*node) = v;
+  int lh1 = heightTree(&(*node)->left->left);
+  int rh1 = heightTree(&(*node)->left->right);
+  int lh2 = heightTree(&(*node)->right->left);
+  int rh2 = heightTree(&(*node)->right->right);
+  (*node)->left->bF = lh1-rh1;
+  (*node)->right->bF = lh2-rh2;
 }
 
 bool removeItem(Pointer *node, int key){
@@ -178,19 +144,14 @@ bool removeItem(Pointer *node, int key){
   }
 
   if((*node)->element.key == key){
-    // if((*node)->left == NULL && (*node)->right == NULL){
-    //   printf("Esq e Dir vazia\nelemento: %d\n", (*node)->element.key);
-    //   // (*node) = NULL;
-    // }
-
     if((*node)->left == NULL){
-      printf("Esq vazia\n");
+      // printf("Esq vazia\n");
       (*node) = (*node)->right;
       return (true);
     }
 
     if((*node)->right == NULL){
-      printf("Dir vazia\n");
+      // printf("Dir vazia\n");
       (*node) = (*node)->left;
       return (true);
     }
@@ -214,7 +175,6 @@ bool removeItem(Pointer *node, int key){
   // printf("Altura Esq. %d\n", lh);
   int bf = rh-lh;
   if(bf >= 2 || bf <= -2){
-    printf("Unbalanced..\n");
     makeRotations(&(*node), bf);
   }
 }
@@ -225,28 +185,22 @@ Pointer getMaxAux(Pointer *node){
   return aux;
 }
 
-Pointer getMinAux(Pointer *node){
-  Pointer aux;
-  for(aux = (*node); aux->left != NULL; aux = aux->left);
-  return aux;
+void printAux(FILE *arq, Pointer *node, int level){
+  if ((*node) == NULL) return;
+  if(level == 1){
+    fprintf(arq, "%d[%d], ", (*node)->element.key, (*node)->bF);
+  } else if(level > 1){
+    printAux(arq, &(*node)->left, level-1);
+    printAux(arq, &(*node)->right, level-1);
+  }
 }
 
-void write(FILE *arq, Pointer *tree){
-  // implementation to write in file
-}
-
-void preOrder(Pointer *node){
-  if((*node)== NULL) return;
-  printf("%d ", (*node)->element.key);
-  preOrder(&(*node)->left);
-  preOrder(&(*node)->right);
-}
-
-void inOrder(Pointer *node){
-  if(*node == NULL) return;
-  inOrder(&(*node)->left);
-  printf("%d ", (*node)->element.key);
-  inOrder(&(*node)->right);
+void print(FILE *arq, Pointer *node){
+  int h = heightTree(&(*node));
+  for (int i=0; i <= h; i++) {
+    printAux(arq, &(*node),i);
+    fprintf(arq, "\n");
+  }
 }
 
 int main(int argc, char **argv){
@@ -280,6 +234,9 @@ int main(int argc, char **argv){
     insert(&tree, ob);
     // end of tree insertion
 
+    // BEF REMOVE
+    fprintf(arqout, "[*]antes\n");
+    print(arqout,&tree);
 
     // read remove numbers
       while(fscanf(arqin, "%d%c", &num, &lixo) != EOF){
@@ -288,18 +245,12 @@ int main(int argc, char **argv){
 
     // end of tree removal
 
-    // BEF REMOVE
-    fprintf(arqout, "[*]antes\n");
-    // write(arqout, &tree);
-    printf("## 50%% of File Write ##\n");
-
     // AFTER REMOVE
     fprintf(arqout, "\n\n[*]depois\n");
-    // write(arqout, &tree);
+    print(arqout,&tree);
+    printf("######################################################\n");
     printf("## File Write ## \n");
-
-    printf("\n\n\n");
-    preOrder(&tree);
+    printf("######################################################\n");
 
 
 
