@@ -2,4 +2,4 @@ cmake
 main
 cmake-build-debug/
 CMakeLists.txt
-*.exe
+
