@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <stdbool.h>
 
+#define MAXTAM 20
 
 typedef struct {
   int id; // identification of the plane
@@ -13,11 +15,10 @@ typedef struct {
 } plane;
 
 typedef struct {
-  int id; // identification of queue
   int count; // quantity of planes in the queue
   int start; // start of the queue
   int end; // end of the queue
-  plane planes[20]; // array of planes
+  plane planes[MAXTAM]; // array of planes
 } queue;
 
 typedef struct {
@@ -39,14 +40,15 @@ void initQueue(queue*);
 bool enqueue(queue*,plane);
 plane dequeue(queue*);
 int size(queue*);
-int isEmpty(queue*)
-int isFull(queue*)
+bool isEmpty(queue*);
+bool isFull(queue*);
 int increaseIndex(int); // function to calculate the index of the queue
 
 // airport manipulation funciotns
 void initAirport (airport*);
-void start(int*);
 void land(airport*,plane*,int);
 void takeOff(airport*, plane*,int);
+void printResults(airport*);
+void updateFuel(airport*);
 
 #endif
