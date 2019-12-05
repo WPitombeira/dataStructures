@@ -8,10 +8,13 @@
 
 typedef struct {
   int key;
+  char color;
+  int d;
+  int f;
+  int dad;
+  int *adjs;
 } vertice;
 
-
-
-
+void init(vertice*);
 
 #endif
